@@ -1,3 +1,3 @@
 @echo off
 
-set DEBUG=im-server:* && npm start
+set DEBUG=im-server:* && npm run dev
