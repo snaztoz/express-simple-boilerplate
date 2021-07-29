@@ -4,6 +4,10 @@ const router = express.Router();
 const authService = require('../services/auth');
 
 
+/**
+ * Melakukan signup user. Mengembalikan respon JSON yang
+ * berisikan token JWT user ketika operasi sukses dilakukan.
+ */
 router.post('/signup', async (req, res) => {
     const body = {
         username: req.body.username,
@@ -45,6 +49,10 @@ router.post('/signup', async (req, res) => {
     res.status(201).send({ token });
 });
 
+/**
+ * Melakukan login. Mengembalikan respon JSON yang berisikan
+ * token JWT dari user ketika login berhasil.
+ */
 router.post('/login', async (req, res) => {
     const body = {
         id: req.body.id,
@@ -86,21 +94,34 @@ router.post('/login', async (req, res) => {
     res.status(200).send({ token });
 });
 
-// Fungsi dari route ini yakni untuk memeriksa apakah
-// sebuah token yang dimiliki oleh klien valid atau tidak.
-//
-// Baik valid maupun tidaknya sebuah token, status yang
-// akan dikembalikan tetap 200, hanya saja beserta dengan
-// JSON yang berisikan informasi mengenai valid tidaknya
-// token tersebut.
+/**
+ * Memeriksa apakah token yang disimpan user valid atau
+ * tidak.
+ *
+ * Baik valid maupun tidaknya sebuah token, status yang
+ * akan dikembalikan tetap 200, hanya saja informasi
+ * mengenai valid tidaknya token tersebut akan berbeda di
+ * dalam respon JSON yang dihasilkan.
+ *
+ * Untuk menggunakan route ini, klien harus memasang header
+ * Authorization dengan skema "Bearer <token>".
+ */
 router.post('/verify', async (req, res) => {
-    const token = req.body.token;
-    if (!token)
+    const authHeader = req.get('Authorization');
+    if (!authHeader)
     {
-        res.status(401).send({err: 'missing token'});
+        res.status(400).send({err: 'missing token'});
         return;
     }
 
+    const splittedAuthHeader = authHeader.split(' ');
+    if (splittedAuthHeader.length != 2 || splittedAuthHeader[0] != 'Bearer')
+    {
+        res.status(400).send({err: 'invalid Authorization header'});
+        return;
+    }
+
+    const token = splittedAuthHeader[1];
     let valid;
 
     try

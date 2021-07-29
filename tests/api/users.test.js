@@ -27,7 +27,7 @@ describe('User API', () => {
 
             const res = await request(app)
                 .post('/users/verify')
-                .send({ token: validToken });
+                .set('Authorization', `Bearer ${validToken}`);
 
             expect(res.status).toBe(200);
             expect(res.body.valid).toBe(true);
@@ -36,13 +36,21 @@ describe('User API', () => {
         it('should error when no token is presents', async () => {
             const res = await request(app).post('/users/verify');
 
-            expect(res.status).toBe(401);
+            expect(res.status).toBe(400);
+        });
+
+        it('should error when Authorization header is invalid', async () => {
+            const res = await request(app)
+                .post('/users/verify')
+                .set('Authorization', 'BlablaFoo ladida haha');
+
+            expect(res.status).toBe(400);
         });
 
         it('should returns proper result when token is invalid', async () => {
             const res = await request(app)
                 .post('/users/verify')
-                .send({ token: 'LolSomeInvalidTokenGoBrrrrr' });
+                .set('Authorization', `Bearer LolSomeInvalidTokenGoBrrrrr`);
 
             expect(res.status).toBe(200);
             expect(res.body.valid).toBe(false);
