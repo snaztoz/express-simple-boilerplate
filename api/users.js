@@ -45,5 +45,35 @@ router.post('/signup', async (req, res) => {
     res.status(201).send({ token });
 });
 
+// Fungsi dari route ini yakni untuk memeriksa apakah
+// sebuah token yang dimiliki oleh klien valid atau tidak.
+//
+// Baik valid maupun tidaknya sebuah token, status yang
+// akan dikembalikan tetap 200, hanya saja beserta dengan
+// JSON yang berisikan informasi mengenai valid tidaknya
+// token tersebut.
+router.post('/verify', async (req, res) => {
+    const token = req.body.token;
+    if (!token)
+    {
+        res.status(401).send({err: 'missing token'});
+        return;
+    }
+
+    let valid;
+
+    try
+    {
+        await authService.verifyJwt(token);
+        valid = true;
+    }
+    catch (_)
+    {
+        valid = false;
+    }
+
+    res.status(200).send({ valid });
+});
+
 
 module.exports = router;

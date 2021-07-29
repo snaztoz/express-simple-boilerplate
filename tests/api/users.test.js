@@ -19,6 +19,36 @@ describe('User API', () => {
     });
 
 
+    describe('User Verifying', () => {
+
+        it('should fine for normal case', async () => {
+            // bypass proses authentikasi
+            const validToken = await authService.createJwtFor('test_user');
+
+            const res = await request(app)
+                .post('/users/verify')
+                .send({ token: validToken });
+
+            expect(res.status).toBe(200);
+            expect(res.body.valid).toBe(true);
+        });
+
+        it('should error when no token is presents', async () => {
+            const res = await request(app).post('/users/verify');
+
+            expect(res.status).toBe(401);
+        });
+
+        it('should returns proper result when token is invalid', async () => {
+            const res = await request(app)
+                .post('/users/verify')
+                .send({ token: 'LolSomeInvalidTokenGoBrrrrr' });
+
+            expect(res.status).toBe(200);
+            expect(res.body.valid).toBe(false);
+        });
+    });
+
     describe('User Signup', () => {
 
         it('should fine when signing up a non-existing user', async () => {
