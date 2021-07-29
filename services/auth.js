@@ -1,20 +1,10 @@
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const util = require('util');
 
+const { promisified } = require('../utils');
 const { sequelize } = require('../models');
 
 
 const SALT_ROUNDS = 10;
-
-// Membungkus beberapa fungsi async (callback) ke dalam
-// bentuk Promise.
-const promisified = {
-    jwt: {
-        sign: (() => util.promisify(jwt.sign))(),
-        verify: (() => util.promisify(jwt.verify))()
-    }
-};
 
 const createJwtFor = async (username) => {
     return await promisified.jwt.sign(
