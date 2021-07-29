@@ -13,7 +13,7 @@ router.post('/signup', async (req, res) => {
 
     for (const field in body)
     {
-        if (!body.field)
+        if (!body[field])
         {
             res.status(400).send({err: 'missing field', field});
             return;
@@ -35,8 +35,8 @@ router.post('/signup', async (req, res) => {
     }
 
     const { username } = await authService.createUser(
-        body.username,
         body.email,
+        body.username,
         body.password
     );
 
