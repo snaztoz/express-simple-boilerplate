@@ -1,8 +1,8 @@
 const request = require('supertest');
 
 const app = require('../../app');
+const authService = require('../../services/auth');
 const { sequelize } = require('../../models');
-const { createUser } = require('../../services/auth');
 
 
 describe('User API', () => {
@@ -33,7 +33,11 @@ describe('User API', () => {
                 });
 
             expect(res.status).toBe(201);
-            expect(res.body.username).toBe(username);
+
+            const token = res.body.token;
+            const decodedPayload = await authService.verifyJwt(token);
+
+            expect(decodedPayload.username).toBe(username);
         });
 
         it('should error when signing up with incomplete data', async () => {
@@ -83,7 +87,11 @@ describe('User API', () => {
                         password: 'password',
                     },
                     dummyDataCreation: async () => {
-                        await createUser('test@email.com', 'test_user', 'password');
+                        await authService.createUser(
+                            'test@email.com',
+                            'test_user',
+                            'password'
+                        );
                     }
                 },
                 {
@@ -94,7 +102,11 @@ describe('User API', () => {
                         password: 'password',
                     },
                     dummyDataCreation: async () => {
-                        await createUser('test@email.com', 'test_user', 'password');
+                        await authService.createUser(
+                            'test@email.com',
+                            'test_user',
+                            'password'
+                        );
                     }
                 }
             ];

@@ -40,7 +40,9 @@ router.post('/signup', async (req, res) => {
         body.password
     );
 
-    res.status(201).send({ username });
+    const token = await authService.createJwtFor(username);
+
+    res.status(201).send({ token });
 });
 
 
