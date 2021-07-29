@@ -44,6 +44,10 @@ const getUserByUsername = async (username) => {
     return user;
 };
 
+const validateLogin = async (user, rawPassword) => {
+    return await bcrypt.compare(rawPassword, user.password);
+};
+
 const verifyJwt = async (token) => {
     return await promisified.jwt.verify(token, process.env.JWT_SECRET);
 };
@@ -54,5 +58,6 @@ module.exports = {
     createUser,
     getUserByEmail,
     getUserByUsername,
+    validateLogin,
     verifyJwt,
 };

@@ -157,4 +157,102 @@ describe('User API', () => {
             }
         });
     });
+
+    describe('User Login', () => {
+
+        it('should log user in when the credentials are correct', async () => {
+            // dummy user
+            await authService.createUser(
+                'test@email.com',
+                'test_user',
+                'password'
+            );
+
+            const cases = [
+                {
+                    data: {
+                        id: 'test@email.com',
+                        password: 'password',
+                    }
+                },
+                {
+                    data: {
+                        id: 'test_user',
+                        password: 'password',
+                    }
+                },
+            ]
+
+            for (const c of cases)
+            {
+                const res = await request(app)
+                    .post('/users/login')
+                    .send(c.data);
+
+                expect(res.status).toBe(200);
+
+                const decoded = await authService.verifyJwt(res.body.token);
+                expect(decoded.username).toBe('test_user');
+            }
+        });
+
+        it('should returns error when the credentials are missing', async () => {
+            const cases = [
+                {
+                    missing: 'id',
+                    data: {
+                        password: 'password',
+                    },
+                },
+                {
+                    missing: 'password',
+                    data: {
+                        id: 'test_user',
+                    },
+                }
+            ];
+
+            for (const c of cases)
+            {
+                const res = await request(app)
+                    .post('/users/login')
+                    .send(c.data);
+
+                expect(res.status).toBe(400);
+                expect(res.body.err).toBe('missing field');
+                expect(res.body.field).toBe(c.missing);
+            }
+        });
+
+        it('should returns error when user not exists', async () => {
+            const res = await request(app)
+                .post('/users/login')
+                .send({
+                    id: 'test_user',
+                    password: 'password'
+                });
+
+            expect(res.status).toBe(403);
+            expect(res.body.err).toBe('user not exists');
+        });
+
+        it('should returns error when the password is wrong', async () => {
+            // dummy user
+            await authService.createUser(
+                'test@email.com',
+                'test_user',
+                'password'
+            );
+
+            const res = await request(app)
+                .post('/users/login')
+                .send({
+                    id: 'test_user',
+                    password: 'wrong!!!'
+                });
+
+            expect(res.status).toBe(403);
+            expect(res.body.err).toBe('incorrect password');
+        });
+    });
 });

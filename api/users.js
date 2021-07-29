@@ -45,6 +45,47 @@ router.post('/signup', async (req, res) => {
     res.status(201).send({ token });
 });
 
+router.post('/login', async (req, res) => {
+    const body = {
+        id: req.body.id,
+        password: req.body.password,
+    };
+
+    for (const field in body)
+    {
+        if (!body[field])
+        {
+            res.status(400).send({err: 'missing field', field});
+            return;
+        }
+    }
+
+    const isEmail = body.id.includes('@');
+    const user = isEmail
+        ? await authService.getUserByEmail(body.id)
+        : await authService.getUserByUsername(body.id);
+
+    if (!user)
+    {
+        res.status(403).send({err: 'user not exists'});
+        return;
+    }
+
+    console.log(user);
+    console.log(body.password);
+
+    const isValidLogin = await authService.validateLogin(user, body.password);
+    if (!isValidLogin)
+    {
+        res.status(403).send({err: 'incorrect password'});
+        return;
+    }
+
+    const token = await authService.createJwtFor(user.username);
+
+    res.status(200).send({ token });
+});
+
 // Fungsi dari route ini yakni untuk memeriksa apakah
 // sebuah token yang dimiliki oleh klien valid atau tidak.
 //
