@@ -1,5 +1,5 @@
 {
-  "name": "im-server",
+  "name": "express-simple-boilerplate",
   "version": "0.0.0",
   "private": true,
   "scripts": {
