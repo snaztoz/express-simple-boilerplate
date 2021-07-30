@@ -26,7 +26,7 @@ describe('User API', () => {
             const validToken = await authService.createJwtFor('test_user');
 
             const res = await request(app)
-                .post('/users/verify')
+                .get('/users/verify')
                 .set('Authorization', `Bearer ${validToken}`);
 
             expect(res.status).toBe(200);
@@ -34,14 +34,14 @@ describe('User API', () => {
         });
 
         it('should error when no token is presents', async () => {
-            const res = await request(app).post('/users/verify');
+            const res = await request(app).get('/users/verify');
 
             expect(res.status).toBe(400);
         });
 
         it('should error when Authorization header is invalid', async () => {
             const res = await request(app)
-                .post('/users/verify')
+                .get('/users/verify')
                 .set('Authorization', 'BlablaFoo ladida haha');
 
             expect(res.status).toBe(400);
@@ -49,7 +49,7 @@ describe('User API', () => {
 
         it('should returns proper result when token is invalid', async () => {
             const res = await request(app)
-                .post('/users/verify')
+                .get('/users/verify')
                 .set('Authorization', `Bearer LolSomeInvalidTokenGoBrrrrr`);
 
             expect(res.status).toBe(200);

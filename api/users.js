@@ -106,7 +106,7 @@ router.post('/login', async (req, res) => {
  * Untuk menggunakan route ini, klien harus memasang header
  * Authorization dengan skema "Bearer <token>".
  */
-router.post('/verify', async (req, res) => {
+router.get('/verify', async (req, res) => {
     const authHeader = req.get('Authorization');
     if (!authHeader)
     {
