@@ -79,9 +79,6 @@ router.post('/login', async (req, res) => {
         return;
     }
 
-    console.log(user);
-    console.log(body.password);
-
     const isValidLogin = await authService.validateLogin(user, body.password);
     if (!isValidLogin)
     {
